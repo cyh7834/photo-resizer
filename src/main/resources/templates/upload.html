@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload jpg Files</title>
+</head>
+<body>
+    <h1>file upload</h1>
+    <form method="post" th:action="@{/resize}" enctype="multipart/form-data">
+        <input multiple type="file" name="files" accept=".jpg">
+        <button>submit</button>
+    </form>
+</body>
+</html>
