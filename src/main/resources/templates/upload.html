@@ -6,9 +6,20 @@
 </head>
 <body>
     <h1>file upload</h1>
-    <form method="post" th:action="@{/resize}" enctype="multipart/form-data">
-        <input multiple type="file" name="files" accept=".jpg">
-        <button>submit</button>
+    <form method="post" th:action="@{/resize}" enctype="multipart/form-data" id="file-form" th:object="${uploadDto}">
+        <input multiple id="file-input" type="file" name="files" accept=".jpg">
+        <button type="button" onclick="resize()">submit</button>
+        <small th:if="${#fields.hasErrors('files')}" th:errors="*{files}">File Error</small>
     </form>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let message = [[${message}]];
+
+        if(message){
+            alert(message);
+        }
+        /*]]>*/
+    </script>
+    <script th:src="@{/js/upload.js}"></script>
 </body>
 </html>
