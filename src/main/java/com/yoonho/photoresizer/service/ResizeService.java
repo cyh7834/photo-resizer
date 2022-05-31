@@ -8,6 +8,10 @@ import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.yoonho.photoresizer.dto.DownloadDto;
 import com.yoonho.photoresizer.dto.FileDto;
+import com.yoonho.photoresizer.exception.CustomIOException;
+import com.yoonho.photoresizer.exception.CustomImageProcessingException;
+import com.yoonho.photoresizer.exception.CustomMetadataException;
+import com.yoonho.photoresizer.exception.CustomNotJpgException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -76,7 +80,7 @@ public class ResizeService {
                 ImageIO.write(newImage, "JPG", new File(resizeFilePath, uuid + "_" + fileName));
                 downloadDtoList.add(new DownloadDto(uuid, fileName));
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.", e);
             }
         }
 
@@ -96,14 +100,12 @@ public class ResizeService {
 
             return orientation;
         } catch (ImageProcessingException e) {
-            e.printStackTrace();
+            throw new CustomImageProcessingException("파일 메타 데이터 확인 중 오류가 발생하였습니다.", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new CustomIOException("파일 로드 중 오류가 발생하였습니다.", e);
         } catch (MetadataException e) {
-            e.printStackTrace();
+            throw new CustomMetadataException("파일 메타 데이터 추출 중 오류가 발생하였습니다.", e);
         }
-
-        return orientation;
     }
 
     private BufferedImage rotateImage(File file, int orientation) {
@@ -112,7 +114,7 @@ public class ResizeService {
         try {
             bufferedImage = ImageIO.read(file);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new CustomIOException("파일 변환 중 오류가 발생하였습니다.", e);
         }
 
         if (orientation == 1) { // 정위치

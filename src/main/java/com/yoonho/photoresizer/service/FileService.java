@@ -1,6 +1,7 @@
 package com.yoonho.photoresizer.service;
 
 import com.yoonho.photoresizer.dto.FileDto;
+import com.yoonho.photoresizer.exception.CustomIOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +27,7 @@ public class FileService {
             try {
                 multipartFile.transferTo(file);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new CustomIOException("파일 업로드 중 오류가 발생하였습니다.", e);
             }
 
             FileDto fileDto = new FileDto(
