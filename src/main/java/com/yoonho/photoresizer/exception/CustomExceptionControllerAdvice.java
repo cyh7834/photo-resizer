@@ -1,41 +1,34 @@
 package com.yoonho.photoresizer.exception;
 
-import com.yoonho.photoresizer.dto.UploadDto;
-import org.springframework.ui.Model;
+import com.yoonho.photoresizer.response.Message;
+import com.yoonho.photoresizer.response.ResponseService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
+@RequiredArgsConstructor
 public class CustomExceptionControllerAdvice {
-    @ExceptionHandler(CustomNotJpgException.class)
-    public String handleCustomNotJpgException(CustomNotJpgException exception, Model model) {
-        model.addAttribute("message", exception.getMessage());
-        model.addAttribute("uploadDto", new UploadDto());
+    private final ResponseService responseService;
 
-        return "upload";
+    @ExceptionHandler(CustomNotJpgException.class)
+    public ResponseEntity<Message> handleCustomNotJpgException(CustomNotJpgException exception) {
+        return responseService.get400ResponseEntity(null, exception.getMessage());
     }
 
     @ExceptionHandler(CustomIOException.class)
-    public String handleCustomIOException(CustomIOException exception, Model model) {
-        model.addAttribute("message", exception.getMessage());
-        model.addAttribute("uploadDto", new UploadDto());
-
-        return "upload";
+    public ResponseEntity<Message> handleCustomIOException(CustomIOException exception) {
+        return responseService.get500ResponseEntity(null, exception.getMessage());
     }
 
     @ExceptionHandler(CustomImageProcessingException.class)
-    public String handleCustomImageProcessingException(CustomImageProcessingException exception, Model model) {
-        model.addAttribute("message", exception.getMessage());
-        model.addAttribute("uploadDto", new UploadDto());
-
-        return "upload";
+    public ResponseEntity<Message> handleCustomImageProcessingException(CustomImageProcessingException exception) {
+        return responseService.get500ResponseEntity(null, exception.getMessage());
     }
 
     @ExceptionHandler(CustomMetadataException.class)
-    public String handleCustomMetadataException(CustomMetadataException exception, Model model) {
-        model.addAttribute("message", exception.getMessage());
-        model.addAttribute("uploadDto", new UploadDto());
-
-        return "upload";
+    public ResponseEntity<Message> handleCustomMetadataException(CustomMetadataException exception) {
+        return responseService.get500ResponseEntity(null, exception.getMessage());
     }
 }
