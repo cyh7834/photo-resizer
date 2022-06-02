@@ -1,23 +1,37 @@
-function resize() {
-    let formElement = document.getElementById("file-form");
-    let inputElement = document.getElementById("file-input");
-    let files = inputElement.files;
-    let fileLength = files.length;
+let dropzone = new Dropzone('#demo-upload', {
+    init: function () {
+        this.on("success", function(file, response) {
+            let fileName, uuid;
+            const li = document.createElement("li");
+            const span = document.createElement("span");
+            const a = document.createElement("a");
 
-    if (fileLength === 0)
-        return;
+            if (response.status === "OK") {
+                fileName = response.data.fileName;
+                uuid = response.data.uuid;
+                a.setAttribute("href", '/download?uuid=' + uuid + '&fileName=' + fileName);
+                a.innerText = " [download]";
+            }
+            else {
+                fileName = file.upload.filename;
+                a.innerText = " " + response.comment;
+            }
+            span.innerText = fileName;
+            li.appendChild(span);
+            li.appendChild(a);
 
-    for (let i = 0; i < fileLength; i++) {
-        if (!isValidExtension(files[i])) {
-            alert("지원하지 않는 형식의 포맷입니다.");
-
-            return;
-        }
-    }
-
-    formElement.submit();
-}
-
-function isValidExtension(file) {
-    return file.type === "image/jpeg";
-}
+            document.getElementById('download-ul').appendChild(li);
+        })
+    },
+    previewTemplate: document.querySelector('#preview-template').innerHTML,
+    url: "/resize",
+    maxFiles: 10,
+    parallelUploads: 3,
+    thumbnailHeight: 120,
+    thumbnailWidth: 120,
+    maxFilesize: 500,
+    filesizeBase: 1000,
+    paramName: "file",
+    acceptedFiles: ".jpg, .jpeg",
+    addRemoveLinks: true
+});
