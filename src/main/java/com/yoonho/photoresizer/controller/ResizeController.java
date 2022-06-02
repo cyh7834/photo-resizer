@@ -4,6 +4,8 @@ import com.yoonho.photoresizer.dto.DownloadDto;
 import com.yoonho.photoresizer.dto.FileDto;
 import com.yoonho.photoresizer.dto.UploadDto;
 import com.yoonho.photoresizer.exception.CustomIOException;
+import com.yoonho.photoresizer.response.Message;
+import com.yoonho.photoresizer.response.ResponseService;
 import com.yoonho.photoresizer.service.FileService;
 import com.yoonho.photoresizer.service.ResizeService;
 import com.yoonho.photoresizer.validator.UploadFormValidator;
@@ -27,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 @Slf4j
 @Controller
@@ -36,6 +37,7 @@ public class ResizeController {
     private final ResizeService resizeService;
     private final FileService fileService;
     private final UploadFormValidator uploadFormValidator;
+    private final ResponseService responseService;
 
     @Value("${resize.file.path}")
     private String resizeFilePath;
@@ -48,23 +50,21 @@ public class ResizeController {
     }
 
     @PostMapping("/resize")
-    public String resizeJpg(UploadDto uploadDto, BindingResult result, Model model) {
+    @ResponseBody
+    public ResponseEntity<Message> resizeJpg(UploadDto uploadDto, BindingResult result) {
         uploadFormValidator.validate(uploadDto, result);
 
         if (result.hasErrors()) {
-            model.addAttribute(uploadDto);
             log.error("파일 확장자 에러 발생");
 
-            return "upload";
+            return responseService.get400ResponseEntity(null, "지원하지 않는 확장자 입니다.");
         }
 
-        List<MultipartFile> multipartFiles = uploadDto.getFiles();
-        List<FileDto> files = fileService.convertMultipartToFile(multipartFiles);
-        List<DownloadDto> downloadDtoList = resizeService.resizeJpg(files);
+        MultipartFile multipartFile = uploadDto.getFile();
+        FileDto fileDto = fileService.convertMultipartToFile(multipartFile);
+        DownloadDto downloadDto = resizeService.resizeJpg(fileDto);
 
-        model.addAttribute("files", downloadDtoList);
-
-        return "download";
+        return responseService.get200ResponseEntity(downloadDto, null);
     }
 
     @GetMapping("/download")

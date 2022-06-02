@@ -20,8 +20,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -29,62 +27,56 @@ public class ResizeService {
     @Value("${resize.file.path}")
     private String resizeFilePath;
 
-    public List<DownloadDto> resizeJpg(List<FileDto> files) {
-        List<DownloadDto> downloadDtoList = new ArrayList<>();
+    public DownloadDto resizeJpg(FileDto fileDto) {
+        String filePath = fileDto.getFilePath();
+        File file = new File(filePath);
+        int orientation = getOrientation(file);
+        BufferedImage bufferedImage = rotateImage(file, orientation);
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight(null);
+        int whitePixel, squareSize;
 
-        for (FileDto fileDto : files) {
-            String filePath = fileDto.getFilePath();
-            File file = new File(filePath);
-            int orientation = getOrientation(file);
-            BufferedImage bufferedImage = rotateImage(file, orientation);
-            int width = bufferedImage.getWidth();
-            int height = bufferedImage.getHeight(null);
-            int whitePixel, squareSize;
+        if (width > height) {
+            whitePixel = (int) (width - height) / 2;
+            squareSize = width;
+        }
+        else {
+            whitePixel = (int) (height - width) / 2;
+            squareSize = height;
+        }
 
-            if (width > height) {
-                whitePixel = (int) (width - height) / 2;
-                squareSize = width;
-            }
-            else {
-                whitePixel = (int) (height - width) / 2;
-                squareSize = height;
-            }
+        BufferedImage newImage = new BufferedImage(squareSize, squareSize, bufferedImage.getType());
 
-            BufferedImage newImage = new BufferedImage(squareSize, squareSize, bufferedImage.getType());
-
-            for (int x = 0; x < squareSize; x++) {
-                for (int y = 0; y < squareSize; y++) {
-                    if (squareSize == width) {
-                        if (y < whitePixel || y >= height + whitePixel) { //white pixel zone
-                            newImage.setRGB(x, y, 0xFFFFFF);
-                        }
-                        else {
-                            newImage.setRGB(x, y, bufferedImage.getRGB(x, y - whitePixel));
-                        }
+        for (int x = 0; x < squareSize; x++) {
+            for (int y = 0; y < squareSize; y++) {
+                if (squareSize == width) {
+                    if (y < whitePixel || y >= height + whitePixel) { //white pixel zone
+                        newImage.setRGB(x, y, 0xFFFFFF);
                     }
                     else {
-                        if (x < whitePixel || x >= width + whitePixel) { //white pixel zone
-                            newImage.setRGB(x, y, 0xFFFFFF);
-                        }
-                        else {
-                            newImage.setRGB(x, y, bufferedImage.getRGB(x - whitePixel, y));
-                        }
+                        newImage.setRGB(x, y, bufferedImage.getRGB(x, y - whitePixel));
+                    }
+                }
+                else {
+                    if (x < whitePixel || x >= width + whitePixel) { //white pixel zone
+                        newImage.setRGB(x, y, 0xFFFFFF);
+                    }
+                    else {
+                        newImage.setRGB(x, y, bufferedImage.getRGB(x - whitePixel, y));
                     }
                 }
             }
-
-            try {
-                String uuid = UUID.randomUUID().toString();
-                String fileName = fileDto.getFileName();
-
-                ImageIO.write(newImage, "JPG", new File(resizeFilePath, uuid + "_" + fileName));
-                downloadDtoList.add(new DownloadDto(uuid, fileName));
-            } catch (IOException e) {
-                throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.", e);
-            }
         }
 
-        return downloadDtoList;
+        try {
+            String uuid = UUID.randomUUID().toString();
+            String fileName = fileDto.getFileName();
+
+            ImageIO.write(newImage, "JPG", new File(resizeFilePath, uuid + "_" + fileName));
+            return new DownloadDto(uuid, fileName);
+        } catch (IOException e) {
+            throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.", e);
+        }
     }
 
     private int getOrientation(File file) {

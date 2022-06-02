@@ -6,8 +6,6 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @Component
 public class UploadFormValidator implements Validator {
     @Override
@@ -18,14 +16,11 @@ public class UploadFormValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         UploadDto uploadDto = (UploadDto) target;
-        List<MultipartFile> multipartFiles = uploadDto.getFiles();
+        MultipartFile multipartFile = uploadDto.getFile();
+        String contentType = multipartFile.getContentType();
 
-        for (MultipartFile multipartFile : multipartFiles) {
-            String contentType = multipartFile.getContentType();
-
-            if (contentType == null || !isSupportedContentType(contentType)) {
-                errors.rejectValue("files", "invalid.contentType", "지원하지 않는 확장자 입니다.");
-            }
+        if (contentType == null || !isSupportedContentType(contentType)) {
+            errors.rejectValue("files", "invalid.contentType", "지원하지 않는 확장자 입니다.");
         }
     }
 
