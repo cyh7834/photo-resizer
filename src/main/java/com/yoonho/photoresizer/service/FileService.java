@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 @Service
 public class FileService {
@@ -15,7 +16,7 @@ public class FileService {
     private String uploadPath;
 
     public FileDto convertMultipartToFile(MultipartFile multipartFile) {
-        String fileName = multipartFile.getOriginalFilename();
+        String fileName = UUID.randomUUID().toString() + "_" + multipartFile.getOriginalFilename();
         String filePath = uploadPath + "\\" + fileName;
         File file = new File(filePath);
 

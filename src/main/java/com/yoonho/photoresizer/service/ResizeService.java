@@ -6,7 +6,6 @@ import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
-import com.yoonho.photoresizer.dto.DownloadDto;
 import com.yoonho.photoresizer.dto.FileDto;
 import com.yoonho.photoresizer.exception.CustomIOException;
 import com.yoonho.photoresizer.exception.CustomImageProcessingException;
@@ -20,14 +19,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 @Service
 public class ResizeService {
     @Value("${resize.file.path}")
     private String resizeFilePath;
 
-    public DownloadDto resizeJpg(FileDto fileDto) {
+    public String resizeJpg(FileDto fileDto) {
         String filePath = fileDto.getFilePath();
         File file = new File(filePath);
         int orientation = getOrientation(file);
@@ -69,11 +67,10 @@ public class ResizeService {
         }
 
         try {
-            String uuid = UUID.randomUUID().toString();
             String fileName = fileDto.getFileName();
 
-            ImageIO.write(newImage, "JPG", new File(resizeFilePath, uuid + "_" + fileName));
-            return new DownloadDto(uuid, fileName);
+            ImageIO.write(newImage, "JPG", new File(resizeFilePath, fileName));
+            return fileName;
         } catch (IOException e) {
             throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.", e);
         }

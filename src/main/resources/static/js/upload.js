@@ -7,9 +7,8 @@ let dropzone = new Dropzone('#demo-upload', {
             const a = document.createElement("a");
 
             if (response.status === "OK") {
-                fileName = response.data.fileName;
-                uuid = response.data.uuid;
-                a.setAttribute("href", '/download?uuid=' + uuid + '&fileName=' + fileName);
+                fileName = response.data;
+                a.setAttribute("href", '/download/' + fileName);
                 a.innerText = " [download]";
             }
             else {
