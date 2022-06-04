@@ -19,6 +19,8 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link rel="stylesheet" th:href="@{/css/styles.css}" type="text/css" />
     <link rel="stylesheet" th:href="@{/css/upload.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/css/list.css}" type="text/css"/>
+
 </head>
 <body>
     <!-- Navigation-->
@@ -109,10 +111,47 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <!--<div class="col-md-6">
                         <div id="download">
                             <ul id="download-ul">
                             </ul>
+                        </div>
+                    </div>-->
+                    <div class="col-md-6">
+                        <div class="card m-b-30">
+                            <div class="card-header">
+                                <div class="row align-items-center">
+                                    <div class="col-8">
+                                        <h5 class="card-title mb-0">Converted Files</h5>
+                                    </div>
+                                    <div class="col-4">
+                                        <ul class="list-inline-group text-right mb-1 pl-0">
+                                            <li class="list-inline-item mr-0 font-12"><i class="feather icon-more-vertical- font-20 text-primary"></i></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="product-file-type">
+                                    <ul id="download-ul" class="list-unstyled">
+                                        <!--<li class="media mb-3">
+                                            <div class="media-body">
+                                                <div class="container">
+                                                    <div class="row">
+                                                        <div class="col-7">
+                                                            <h5 class="font-16 mb-1">Marketing Guidelines</h5>
+                                                            <p>.jpg, 5.3 MB</p>
+                                                        </div>
+                                                        <div class="col-3">
+                                                            <button class="btn btn-danger">Download</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>-->
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

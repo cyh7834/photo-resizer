@@ -1,23 +1,62 @@
 let dropzone = new Dropzone('#demo-upload', {
     init: function () {
         this.on("success", function(file, response) {
-            let fileName, uuid;
+            let fileName;
             const li = document.createElement("li");
-            const span = document.createElement("span");
-            const a = document.createElement("a");
+            li.className = "media mb-3";
+
+            const mediaDiv = document.createElement("div");
+            mediaDiv.className = "media-body";
+
+            const container = document.createElement("div");
+            container.className = "container";
+
+            const row = document.createElement("div");
+            row.className = "row";
+
+            const leftDiv = document.createElement("div");
+            leftDiv.className = "col-8";
+
+            const fileNameH5 = document.createElement("h5");
+            fileNameH5.className = "font-16 mb-1";
+            fileNameH5.innerText = response.data
+
+            const fileInfo = document.createElement("p");
+
+            const rightDiv = document.createElement("div");
+            rightDiv.className = "col-2";
+
 
             if (response.status === "OK") {
                 fileName = response.data;
+                fileInfo.innerText = ".jpg 5.3 MB";
+
+                const downloadButton = document.createElement("button");
+                downloadButton.className = "btn btn-danger";
+                downloadButton.innerText = "Download";
+
+                const a = document.createElement("a");
                 a.setAttribute("href", '/download/' + fileName);
-                a.innerText = " [download]";
+                a.appendChild(downloadButton);
+
+                rightDiv.appendChild(a);
             }
             else {
                 fileName = file.upload.filename;
-                a.innerText = " " + response.comment;
+                fileInfo.innerText = " " + response.comment;
             }
-            span.innerText = fileName;
-            li.appendChild(span);
-            li.appendChild(a);
+
+            fileNameH5.innerText = fileName;
+            leftDiv.appendChild(fileNameH5);
+            leftDiv.appendChild(fileInfo);
+
+            row.appendChild(leftDiv);
+            row.appendChild(rightDiv);
+
+            container.appendChild(row);
+            mediaDiv.appendChild(container);
+
+            li.appendChild(mediaDiv);
 
             document.getElementById('download-ul').appendChild(li);
         })
