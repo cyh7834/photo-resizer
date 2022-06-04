@@ -1,5 +1,7 @@
 package com.yoonho.photoresizer.service;
 
+import com.drew.imaging.FileType;
+import com.drew.imaging.FileTypeDetector;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
@@ -17,8 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 @Service
 public class ResizeService {
@@ -28,6 +29,20 @@ public class ResizeService {
     public String resizeJpg(FileDto fileDto) {
         String filePath = fileDto.getFilePath();
         File file = new File(filePath);
+
+        try {
+            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file));
+            FileType fileType = FileTypeDetector.detectFileType(stream);
+
+            if (fileType != FileType.Jpeg) {
+                throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.");
+            }
+        } catch (FileNotFoundException e) {
+            throw new CustomIOException("파일 로드 중 오류가 발생하였습니다.", e);
+        } catch (IOException e) {
+            throw new CustomIOException("파일 타입 추출 중 오류가 발생하였습니다.", e);
+        }
+
         int orientation = getOrientation(file);
         BufferedImage bufferedImage = rotateImage(file, orientation);
         int width = bufferedImage.getWidth();

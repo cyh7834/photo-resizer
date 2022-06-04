@@ -5,6 +5,10 @@ public class CustomNotJpgException extends RuntimeException{
         super();
     }
 
+    public CustomNotJpgException(String message) {
+        super(message);
+    }
+
     public CustomNotJpgException(String message, Throwable cause) {
         super(message, cause);
     }
