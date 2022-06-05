@@ -88,7 +88,12 @@ public class ResizeService {
         }
 
         try {
-            ImageIO.write(newImage, "JPG", new File(resizeFilePath, savedName));
+            File savedFile = new File(resizeFilePath, savedName);
+            ImageIO.write(newImage, "JPG", savedFile);
+            long bytes = savedFile.length();
+            long kilobyte = bytes / 1024;
+            long megabyte = kilobyte / 1024;
+            fileDto.setFileSize(megabyte + "." + (kilobyte - (megabyte * 1024)) / 100 + " MB");
         } catch (IOException e) {
             throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.", e);
         }

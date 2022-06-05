@@ -27,6 +27,6 @@ public class FileService {
             throw new CustomIOException("파일 업로드 중 오류가 발생하였습니다.", e);
         }
 
-        return new FileDto(uuid, fileName);
+        return new FileDto(uuid, fileName, null);
     }
 }

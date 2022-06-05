@@ -29,7 +29,7 @@ let dropzone = new Dropzone('#demo-upload', {
 
             if (response.status === "OK") {
                 fileName = response.data.fileName;
-                fileInfo.innerText = ".jpg 5.3 MB";
+                fileInfo.innerText = response.data.fileSize;
 
                 const downloadButton = document.createElement("button");
                 downloadButton.className = "btn btn-danger";
