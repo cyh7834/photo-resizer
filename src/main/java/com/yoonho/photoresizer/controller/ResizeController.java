@@ -1,5 +1,6 @@
 package com.yoonho.photoresizer.controller;
 
+import com.yoonho.photoresizer.dto.DownloadDto;
 import com.yoonho.photoresizer.dto.FileDto;
 import com.yoonho.photoresizer.dto.UploadDto;
 import com.yoonho.photoresizer.exception.CustomIOException;
@@ -61,14 +62,16 @@ public class ResizeController {
 
         MultipartFile multipartFile = uploadDto.getFile();
         FileDto fileDto = fileService.convertMultipartToFile(multipartFile);
-        String fileName = resizeService.resizeJpg(fileDto);
+        resizeService.resizeJpg(fileDto);
 
-        return responseService.get200ResponseEntity(fileName, null);
+        return responseService.get200ResponseEntity(fileDto, null);
     }
 
-    @GetMapping("/download/{filename}")
-    public ResponseEntity<Resource> download(@PathVariable String filename) {
-        Path path = Paths.get(resizeFilePath + "/" + filename);
+    @GetMapping("/download")
+    public ResponseEntity<Resource> download(@ModelAttribute DownloadDto downloadDto) {
+        String uuid = downloadDto.getUuid();
+        String fileName = downloadDto.getFileName();
+        Path path = Paths.get(resizeFilePath + "/" + uuid + "_" + fileName);
         String contentType = null;
 
         try {
@@ -79,7 +82,7 @@ public class ResizeController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(ContentDisposition.builder("attachment")
-                .filename(filename, StandardCharsets.UTF_8).build());
+                .filename("resized_" + fileName, StandardCharsets.UTF_8).build());
         headers.add(HttpHeaders.CONTENT_TYPE, contentType);
 
         Resource resource = null;

@@ -16,8 +16,9 @@ public class FileService {
     private String uploadPath;
 
     public FileDto convertMultipartToFile(MultipartFile multipartFile) {
-        String fileName = UUID.randomUUID().toString() + "_" + multipartFile.getOriginalFilename();
-        String filePath = uploadPath + "\\" + fileName;
+        String uuid = UUID.randomUUID().toString();
+        String fileName =  multipartFile.getOriginalFilename();
+        String filePath = uploadPath + "\\" + uuid + "_" + fileName;
         File file = new File(filePath);
 
         try {
@@ -26,6 +27,6 @@ public class FileService {
             throw new CustomIOException("파일 업로드 중 오류가 발생하였습니다.", e);
         }
 
-        return new FileDto(fileName, filePath);
+        return new FileDto(uuid, fileName);
     }
 }

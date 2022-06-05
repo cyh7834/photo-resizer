@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileDto {
+    private String uuid;
     private String fileName;
-    private String filePath;
 }

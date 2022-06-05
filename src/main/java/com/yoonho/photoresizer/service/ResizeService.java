@@ -23,11 +23,17 @@ import java.io.*;
 
 @Service
 public class ResizeService {
+    @Value("${spring.servlet.multipart.location}")
+    private String uploadPath;
+
     @Value("${resize.file.path}")
     private String resizeFilePath;
 
-    public String resizeJpg(FileDto fileDto) {
-        String filePath = fileDto.getFilePath();
+    public void resizeJpg(FileDto fileDto) {
+        String uuid = fileDto.getUuid();
+        String fileName = fileDto.getFileName();
+        String savedName = uuid + "_" + fileName;
+        String filePath = uploadPath + "\\" + savedName;
         File file = new File(filePath);
 
         try {
@@ -82,10 +88,7 @@ public class ResizeService {
         }
 
         try {
-            String fileName = fileDto.getFileName();
-
-            ImageIO.write(newImage, "JPG", new File(resizeFilePath, fileName));
-            return fileName;
+            ImageIO.write(newImage, "JPG", new File(resizeFilePath, savedName));
         } catch (IOException e) {
             throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.", e);
         }

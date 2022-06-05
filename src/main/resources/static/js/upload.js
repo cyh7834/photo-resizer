@@ -28,7 +28,7 @@ let dropzone = new Dropzone('#demo-upload', {
 
 
             if (response.status === "OK") {
-                fileName = response.data;
+                fileName = response.data.fileName;
                 fileInfo.innerText = ".jpg 5.3 MB";
 
                 const downloadButton = document.createElement("button");
@@ -36,7 +36,8 @@ let dropzone = new Dropzone('#demo-upload', {
                 downloadButton.innerText = "Download";
 
                 const a = document.createElement("a");
-                a.setAttribute("href", '/download/' + fileName);
+                a.setAttribute("href", '/download?uuid=' + response.data.uuid
+                    + '&fileName=' + response.data.fileName);
                 a.appendChild(downloadButton);
 
                 rightDiv.appendChild(a);
