@@ -8,6 +8,7 @@ import com.yoonho.photoresizer.response.Message;
 import com.yoonho.photoresizer.response.ResponseService;
 import com.yoonho.photoresizer.service.FileService;
 import com.yoonho.photoresizer.service.ResizeService;
+import com.yoonho.photoresizer.validator.DownloadValidator;
 import com.yoonho.photoresizer.validator.UploadFormValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -37,6 +39,7 @@ public class ResizeController {
     private final ResizeService resizeService;
     private final FileService fileService;
     private final UploadFormValidator uploadFormValidator;
+    private final DownloadValidator downloadValidator;
     private final ResponseService responseService;
 
     @Value("${resize.file.path}")
@@ -68,7 +71,15 @@ public class ResizeController {
     }
 
     @GetMapping("/download")
-    public ResponseEntity<Resource> download(@ModelAttribute DownloadDto downloadDto) {
+    public ResponseEntity<Resource> download(@ModelAttribute @Valid DownloadDto downloadDto, BindingResult result) {
+        downloadValidator.validate(downloadDto, result);
+
+        if (result.hasErrors()) {
+            log.error("파일 다운로드 에러 발생");
+
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         String uuid = downloadDto.getUuid();
         String fileName = downloadDto.getFileName();
         Path path = Paths.get(resizeFilePath + "/" + uuid + "_" + fileName);
