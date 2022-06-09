@@ -3,6 +3,7 @@ package com.yoonho.photoresizer.controller;
 import com.yoonho.photoresizer.dto.DownloadDto;
 import com.yoonho.photoresizer.dto.FileDto;
 import com.yoonho.photoresizer.dto.UploadDto;
+import com.yoonho.photoresizer.exception.CustomErrorPageException;
 import com.yoonho.photoresizer.exception.CustomIOException;
 import com.yoonho.photoresizer.response.Message;
 import com.yoonho.photoresizer.response.ResponseService;
@@ -75,9 +76,9 @@ public class ResizeController {
         downloadValidator.validate(downloadDto, result);
 
         if (result.hasErrors()) {
-            log.error("파일 다운로드 에러 발생");
+            log.error("다운로드 요청 데이터가 올바르지 않습니다.");
 
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new CustomErrorPageException("400");
         }
 
         String uuid = downloadDto.getUuid();
@@ -88,7 +89,7 @@ public class ResizeController {
         try {
             contentType = Files.probeContentType(path);
         } catch (IOException e) {
-            throw new CustomIOException("파일 다운로드 중 확장자 오류가 발생하였습니다.", e);
+            throw new CustomErrorPageException("500", e);
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -101,7 +102,7 @@ public class ResizeController {
         try {
             resource = new InputStreamResource(Files.newInputStream(path));
         } catch (IOException e) {
-            throw new CustomIOException("파일 다운로드 중 오류가 발생하였습니다.", e);
+            throw new CustomErrorPageException("500", e);
         }
 
         return new ResponseEntity<>(resource, headers, HttpStatus.OK);
