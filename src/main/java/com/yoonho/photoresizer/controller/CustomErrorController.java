@@ -20,10 +20,10 @@ public class CustomErrorController implements ErrorController {
             if(statusCode == HttpStatus.BAD_REQUEST.value()) {
                 return "error/400error";
             } else {
-                return "error/error";
+                return "error/500error";
             }
         }
 
-        return "error/error";
+        return "error/500error";
     }
 }
