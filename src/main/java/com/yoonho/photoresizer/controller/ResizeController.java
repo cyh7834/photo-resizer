@@ -4,7 +4,6 @@ import com.yoonho.photoresizer.dto.DownloadDto;
 import com.yoonho.photoresizer.dto.FileDto;
 import com.yoonho.photoresizer.dto.UploadDto;
 import com.yoonho.photoresizer.exception.CustomErrorPageException;
-import com.yoonho.photoresizer.exception.CustomIOException;
 import com.yoonho.photoresizer.response.Message;
 import com.yoonho.photoresizer.response.ResponseService;
 import com.yoonho.photoresizer.service.FileService;
@@ -14,11 +13,7 @@ import com.yoonho.photoresizer.validator.UploadFormValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,9 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -84,27 +76,8 @@ public class ResizeController {
         String uuid = downloadDto.getUuid();
         String fileName = downloadDto.getFileName();
         Path path = Paths.get(resizeFilePath + "/" + uuid + "_" + fileName);
-        String contentType = null;
+        String contentType = fileService.getContentType(path);
 
-        try {
-            contentType = Files.probeContentType(path);
-        } catch (IOException e) {
-            throw new CustomErrorPageException("500", e);
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentDisposition(ContentDisposition.builder("attachment")
-                .filename("resized_" + fileName, StandardCharsets.UTF_8).build());
-        headers.add(HttpHeaders.CONTENT_TYPE, contentType);
-
-        Resource resource = null;
-
-        try {
-            resource = new InputStreamResource(Files.newInputStream(path));
-        } catch (IOException e) {
-            throw new CustomErrorPageException("500", e);
-        }
-
-        return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+        return responseService.getResourceResponseEntity(fileName, contentType, path);
     }
 }

@@ -1,6 +1,7 @@
 package com.yoonho.photoresizer.service;
 
 import com.yoonho.photoresizer.dto.FileDto;
+import com.yoonho.photoresizer.exception.CustomErrorPageException;
 import com.yoonho.photoresizer.exception.CustomIOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 
 @Service
@@ -28,5 +31,13 @@ public class FileService {
         }
 
         return new FileDto(uuid, fileName, null);
+    }
+
+    public String getContentType(Path path) {
+        try {
+            return Files.probeContentType(path);
+        } catch (IOException e) {
+            throw new CustomErrorPageException("500", e);
+        }
     }
 }
