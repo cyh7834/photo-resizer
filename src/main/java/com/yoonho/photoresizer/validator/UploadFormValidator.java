@@ -20,7 +20,7 @@ public class UploadFormValidator implements Validator {
         String contentType = multipartFile.getContentType();
 
         if (contentType == null || !isSupportedContentType(contentType)) {
-            errors.rejectValue("files", "invalid.contentType", "지원하지 않는 확장자 입니다.");
+            errors.reject("지원하지 않는 확장자 입니다.");
         }
     }
 

@@ -60,7 +60,10 @@ let dropzone = new Dropzone('#demo-upload', {
             li.appendChild(mediaDiv);
 
             document.getElementById('download-ul').appendChild(li);
-        })
+        });
+        this.on('error', function(file, response) {
+            alert(file.upload.filename + " 파일 업로드 에러가 발생하였습니다.");
+        });
     },
     previewTemplate: document.querySelector('#preview-template').innerHTML,
     url: "/resize",
