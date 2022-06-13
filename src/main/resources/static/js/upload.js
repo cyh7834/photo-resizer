@@ -1,7 +1,6 @@
 let dropzone = new Dropzone('#demo-upload', {
     init: function () {
-        this.on("success", function(file, response) {
-            let fileName;
+        function createListElement(file) {
             const li = document.createElement("li");
             li.className = "media mb-3";
 
@@ -19,35 +18,19 @@ let dropzone = new Dropzone('#demo-upload', {
 
             const fileNameH5 = document.createElement("h5");
             fileNameH5.className = "font-16 mb-1";
-            fileNameH5.innerText = response.data
+            fileNameH5.innerText = file.name;
 
             const fileInfo = document.createElement("p");
 
             const rightDiv = document.createElement("div");
             rightDiv.className = "col-2";
 
+            let downloadUl = document.getElementById('download-ul');
 
-            if (response.status === "OK") {
-                fileName = response.data.fileName;
-                fileInfo.innerText = response.data.fileSize;
+            return {li, mediaDiv, container, row, leftDiv, fileNameH5, fileInfo, rightDiv, downloadUl};
+        }
 
-                const downloadButton = document.createElement("button");
-                downloadButton.className = "btn btn-danger";
-                downloadButton.innerText = "Download";
-
-                const a = document.createElement("a");
-                a.setAttribute("href", '/download?uuid=' + response.data.uuid
-                    + '&fileName=' + response.data.fileName);
-                a.appendChild(downloadButton);
-
-                rightDiv.appendChild(a);
-            }
-            else {
-                fileName = file.upload.filename;
-                fileInfo.innerText = " " + response.comment;
-            }
-
-            fileNameH5.innerText = fileName;
+        function appendListElement(leftDiv, fileNameH5, fileInfo, row, rightDiv, container, mediaDiv, li, downloadUl) {
             leftDiv.appendChild(fileNameH5);
             leftDiv.appendChild(fileInfo);
 
@@ -59,10 +42,32 @@ let dropzone = new Dropzone('#demo-upload', {
 
             li.appendChild(mediaDiv);
 
-            document.getElementById('download-ul').appendChild(li);
+            downloadUl.appendChild(li);
+        }
+
+        this.on("success", function(file, response) {
+            let {li, mediaDiv, container, row, leftDiv, fileNameH5, fileInfo, rightDiv, downloadUl} = createListElement(file);
+
+            fileInfo.innerText = response.data.fileSize;
+
+            const downloadButton = document.createElement("button");
+            downloadButton.className = "btn btn-danger";
+            downloadButton.innerText = "Download";
+
+            const a = document.createElement("a");
+            a.setAttribute("href", '/download?uuid=' + response.data.uuid + '&fileName=' + file.name);
+            a.appendChild(downloadButton);
+
+            rightDiv.appendChild(a);
+
+            appendListElement(leftDiv, fileNameH5, fileInfo, row, rightDiv, container, mediaDiv, li, downloadUl);
         });
         this.on('error', function(file, response) {
-            alert(file.upload.filename + " 파일 업로드 에러가 발생하였습니다.");
+            let {li, mediaDiv, container, row, leftDiv, fileNameH5, fileInfo, rightDiv, downloadUl} = createListElement(file);
+
+            fileInfo.innerText = " " + response.comment;
+
+            appendListElement(leftDiv, fileNameH5, fileInfo, row, rightDiv, container, mediaDiv, li, downloadUl);
         });
     },
     previewTemplate: document.querySelector('#preview-template').innerHTML,

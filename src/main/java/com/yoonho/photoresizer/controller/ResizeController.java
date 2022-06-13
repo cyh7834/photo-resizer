@@ -2,10 +2,12 @@ package com.yoonho.photoresizer.controller;
 
 import com.yoonho.photoresizer.dto.DownloadDto;
 import com.yoonho.photoresizer.dto.FileDto;
+import com.yoonho.photoresizer.dto.ResponseDto;
 import com.yoonho.photoresizer.dto.UploadDto;
 import com.yoonho.photoresizer.exception.CustomErrorPageException;
 import com.yoonho.photoresizer.response.Message;
 import com.yoonho.photoresizer.response.ResponseService;
+import com.yoonho.photoresizer.response.StatusEnum;
 import com.yoonho.photoresizer.service.FileService;
 import com.yoonho.photoresizer.service.ResizeService;
 import com.yoonho.photoresizer.validator.DownloadValidator;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -53,14 +56,16 @@ public class ResizeController {
         if (result.hasErrors()) {
             log.error("파일 확장자 에러 발생");
 
-            return responseService.get400ResponseEntity(null, "지원하지 않는 확장자 입니다.");
+            return responseService.getResponseEntity(new ResponseDto(HttpStatus.BAD_REQUEST, StatusEnum.BAD_REQUEST
+                    , null, "지원하지 않는 확장자 입니다."));
         }
 
         MultipartFile multipartFile = uploadDto.getFile();
         FileDto fileDto = fileService.convertMultipartToFile(multipartFile);
         resizeService.resizeJpg(fileDto);
 
-        return responseService.get200ResponseEntity(fileDto, null);
+        return responseService.getResponseEntity(new ResponseDto(HttpStatus.OK, StatusEnum.OK
+                , fileDto, null));
     }
 
     @GetMapping("/download")

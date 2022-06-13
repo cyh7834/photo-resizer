@@ -1,5 +1,6 @@
 package com.yoonho.photoresizer.response;
 
+import com.yoonho.photoresizer.dto.ResponseDto;
 import com.yoonho.photoresizer.exception.CustomErrorPageException;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -13,25 +14,11 @@ import java.nio.file.Path;
 
 @Service
 public class ResponseService {
-    public ResponseEntity<Message> get200ResponseEntity(Object data, String comment) {
+    public ResponseEntity<Message> getResponseEntity(ResponseDto responseDto) {
         HttpHeaders headers = getHeader();
-        Message message = get200Message(data, comment);
+        Message message = getMessage(responseDto.getData(), responseDto.getComment(), responseDto.getStatusEnum());
 
-        return new ResponseEntity<>(message, headers, HttpStatus.OK);
-    }
-
-    public ResponseEntity<Message> get400ResponseEntity(Object data, String comment) {
-        HttpHeaders headers = getHeader();
-        Message message = get400Message(data, comment);
-
-        return new ResponseEntity<>(message, headers, HttpStatus.OK);
-    }
-
-    public ResponseEntity<Message> get500ResponseEntity(Object data, String comment) {
-        HttpHeaders headers = getHeader();
-        Message message = get500Message(data, comment);
-
-        return new ResponseEntity<>(message, headers, HttpStatus.OK);
+        return new ResponseEntity<>(message, headers, responseDto.getHttpStatus());
     }
 
     public ResponseEntity<Resource> getResourceResponseEntity(String fileName, String contentType, Path path) {
@@ -63,27 +50,9 @@ public class ResponseService {
         return headers;
     }
 
-    private Message get200Message(Object data, String comment) {
+    private Message getMessage(Object data, String comment, StatusEnum statusEnum) {
         Message message = new Message();
-        message.setStatus(StatusEnum.OK);
-        message.setComment(comment);
-        message.setData(data);
-
-        return message;
-    }
-
-    private Message get400Message(Object data, String comment) {
-        Message message = new Message();
-        message.setStatus(StatusEnum.BAD_REQUEST);
-        message.setComment(comment);
-        message.setData(data);
-
-        return message;
-    }
-
-    private Message get500Message(Object data, String comment) {
-        Message message = new Message();
-        message.setStatus(StatusEnum.INTERNAL_SERVER_ERROR);
+        message.setStatus(statusEnum);
         message.setComment(comment);
         message.setData(data);
 
