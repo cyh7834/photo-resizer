@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FileScheduler {
     private final FileService fileService;
+
     @Scheduled(cron = "0 0 0/1 * * *")
     public void deleteOldFile() {
         fileService.deleteOldFile();

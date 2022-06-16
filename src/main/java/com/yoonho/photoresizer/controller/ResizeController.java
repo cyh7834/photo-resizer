@@ -62,6 +62,8 @@ public class ResizeController {
 
         MultipartFile multipartFile = uploadDto.getFile();
         FileDto fileDto = fileService.convertMultipartToFile(multipartFile);
+
+        fileService.checkJpgFileType(fileDto);
         resizeService.resizeJpg(fileDto);
 
         return responseService.getResponseEntity(new ResponseDto(HttpStatus.OK, StatusEnum.OK

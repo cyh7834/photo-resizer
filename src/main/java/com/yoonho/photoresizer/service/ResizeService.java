@@ -1,7 +1,5 @@
 package com.yoonho.photoresizer.service;
 
-import com.drew.imaging.FileType;
-import com.drew.imaging.FileTypeDetector;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
@@ -36,60 +34,13 @@ public class ResizeService {
         String filePath = uploadPath + "\\" + savedName;
         File file = new File(filePath);
 
-        try {
-            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file));
-            FileType fileType = FileTypeDetector.detectFileType(stream);
-
-            if (fileType != FileType.Jpeg) {
-                throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.");
-            }
-        } catch (FileNotFoundException e) {
-            throw new CustomIOException("파일 로드 중 오류가 발생하였습니다.", e);
-        } catch (IOException e) {
-            throw new CustomIOException("파일 타입 추출 중 오류가 발생하였습니다.", e);
-        }
-
         int orientation = getOrientation(file);
-        BufferedImage bufferedImage = rotateImage(file, orientation);
-        int width = bufferedImage.getWidth();
-        int height = bufferedImage.getHeight(null);
-        int whitePixel, squareSize;
-
-        if (width > height) {
-            whitePixel = (int) (width - height) / 2;
-            squareSize = width;
-        }
-        else {
-            whitePixel = (int) (height - width) / 2;
-            squareSize = height;
-        }
-
-        BufferedImage newImage = new BufferedImage(squareSize, squareSize, bufferedImage.getType());
-
-        for (int x = 0; x < squareSize; x++) {
-            for (int y = 0; y < squareSize; y++) {
-                if (squareSize == width) {
-                    if (y < whitePixel || y >= height + whitePixel) { //white pixel zone
-                        newImage.setRGB(x, y, 0xFFFFFF);
-                    }
-                    else {
-                        newImage.setRGB(x, y, bufferedImage.getRGB(x, y - whitePixel));
-                    }
-                }
-                else {
-                    if (x < whitePixel || x >= width + whitePixel) { //white pixel zone
-                        newImage.setRGB(x, y, 0xFFFFFF);
-                    }
-                    else {
-                        newImage.setRGB(x, y, bufferedImage.getRGB(x - whitePixel, y));
-                    }
-                }
-            }
-        }
+        BufferedImage rotatedImage = rotateImage(file, orientation);
+        BufferedImage squareImage = createSquareBufferedImage(rotatedImage);
 
         try {
             File savedFile = new File(resizeFilePath, savedName);
-            ImageIO.write(newImage, "JPG", savedFile);
+            ImageIO.write(squareImage, "JPG", savedFile);
             long bytes = savedFile.length();
             long kilobyte = bytes / 1024;
             long megabyte = kilobyte / 1024;
@@ -169,6 +120,46 @@ public class ResizeService {
         graphics.rotate(Math.toRadians(radians), newImageWidth / 2, newImageHeight / 2);
         graphics.translate((newImageWidth - bufferedImageWidth) / 2, (newImageHeight - bufferedImageHeight) / 2);
         graphics.drawImage(bufferedImage, 0, 0, bufferedImageWidth, bufferedImageHeight, null);
+
+        return newImage;
+    }
+
+    private BufferedImage createSquareBufferedImage(BufferedImage bufferedImage) {
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight(null);
+        int whitePixel, squareSize;
+
+        if (width > height) {
+            whitePixel = (int) (width - height) / 2;
+            squareSize = width;
+        }
+        else {
+            whitePixel = (int) (height - width) / 2;
+            squareSize = height;
+        }
+
+        BufferedImage newImage = new BufferedImage(squareSize, squareSize, bufferedImage.getType());
+
+        for (int x = 0; x < squareSize; x++) {
+            for (int y = 0; y < squareSize; y++) {
+                if (squareSize == width) {
+                    if (y < whitePixel || y >= height + whitePixel) { //white pixel zone
+                        newImage.setRGB(x, y, 0xFFFFFF);
+                    }
+                    else {
+                        newImage.setRGB(x, y, bufferedImage.getRGB(x, y - whitePixel));
+                    }
+                }
+                else {
+                    if (x < whitePixel || x >= width + whitePixel) { //white pixel zone
+                        newImage.setRGB(x, y, 0xFFFFFF);
+                    }
+                    else {
+                        newImage.setRGB(x, y, bufferedImage.getRGB(x - whitePixel, y));
+                    }
+                }
+            }
+        }
 
         return newImage;
     }
