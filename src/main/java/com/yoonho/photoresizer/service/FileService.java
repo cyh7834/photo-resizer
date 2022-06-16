@@ -56,6 +56,7 @@ public class FileService {
             FileType fileType = FileTypeDetector.detectFileType(stream);
 
             if (fileType != FileType.Jpeg) {
+                file.delete();
                 throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.");
             }
         } catch (FileNotFoundException e) {
