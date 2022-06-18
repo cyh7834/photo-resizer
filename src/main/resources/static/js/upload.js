@@ -76,7 +76,7 @@ let dropzone = new Dropzone('#demo-upload', {
     parallelUploads: 3,
     thumbnailHeight: 120,
     thumbnailWidth: 120,
-    maxFilesize: 500,
+    maxFilesize: 20,
     filesizeBase: 1000,
     paramName: "file",
     acceptedFiles: ".jpg, .jpeg",
