@@ -21,12 +21,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -54,10 +56,16 @@ public class ResizeController {
         uploadFormValidator.validate(uploadDto, result);
 
         if (result.hasErrors()) {
-            log.error("파일 확장자 에러 발생");
+            StringBuilder message = new StringBuilder();
+            List<ObjectError> allErrors = result.getAllErrors();
+
+            for (ObjectError error : allErrors) {
+                message.append(error.getCode());
+                message.append("\n");
+            }
 
             return responseService.getResponseEntity(new ResponseDto(HttpStatus.BAD_REQUEST, StatusEnum.BAD_REQUEST
-                    , null, "지원하지 않는 확장자 입니다."));
+                    , null, message.toString()));
         }
 
         MultipartFile multipartFile = uploadDto.getFile();
