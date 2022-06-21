@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -50,9 +51,20 @@ public class CustomExceptionControllerAdvice {
     }
 
     @ExceptionHandler(CustomErrorPageException.class)
-    public String getErrorPage(CustomErrorPageException customErrorPageException) {
+    public String getErrorPage(CustomErrorPageException customErrorPageException, Model model) {
         log.error("error", customErrorPageException);
 
-        return "error/" + customErrorPageException.getMessage() + "error";
+        String message = customErrorPageException.getMessage();
+
+        if (message.equals("400")) {
+            model.addAttribute("code", 400);
+            model.addAttribute("message", "Not a valid request.");
+        }
+        else if (message.equals("500")) {
+            model.addAttribute("code", 500);
+            model.addAttribute("message", "Internal server error.");
+        }
+
+        return "error/error";
     }
 }

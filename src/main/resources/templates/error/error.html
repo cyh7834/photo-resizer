@@ -8,7 +8,8 @@
 <body>
     <div id="main">
         <div class="fof">
-            <h1>Error 500 <br/> 작업 도중 오류가 발생하였습니다.</h1>
+            <h1 th:text="${code + ' Error'}"></h1><br/>
+            <h1 th:text="${message}"></h1><br/>
         </div>
     </div>
 </body>
