@@ -83,8 +83,6 @@ public class ResizeController {
         downloadValidator.validate(downloadDto, result);
 
         if (result.hasErrors()) {
-            log.error("다운로드 요청 데이터가 올바르지 않습니다.");
-
             throw new CustomErrorPageException("400");
         }
 

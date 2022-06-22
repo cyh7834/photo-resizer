@@ -1,12 +1,14 @@
 package com.yoonho.photoresizer.validator;
 
 import com.yoonho.photoresizer.dto.DownloadDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import java.util.regex.Pattern;
 
+@Slf4j
 @Component
 public class DownloadValidator implements Validator {
     @Override
@@ -22,11 +24,12 @@ public class DownloadValidator implements Validator {
         String fileName = downloadDto.getFileName().toLowerCase();
 
         if (!fileName.endsWith(".jpg") && !fileName.endsWith(".jpeg")) {
-            errors.rejectValue("fileName", "invalid.fileName", "올바른 확장자가 아닙니다.");
+            log.error("jpg 외의 확장자 다운로드 요청");
+            errors.reject("올바른 요청이 아닙니다.");
         }
-
-        if (!Pattern.matches(pattern, uuid)) {
-            errors.rejectValue("uuid", "invalid.uuid", "올바른 uuid가 아닙니다.");
+        else if (!Pattern.matches(pattern, uuid)) {
+            log.error("올바르지 않은 UUID 요청");
+            errors.reject("올바른 요청이 아닙니다.");
         }
     }
 }
