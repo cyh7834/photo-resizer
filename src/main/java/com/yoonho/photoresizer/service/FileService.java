@@ -1,11 +1,8 @@
 package com.yoonho.photoresizer.service;
 
-import com.drew.imaging.FileType;
-import com.drew.imaging.FileTypeDetector;
 import com.yoonho.photoresizer.dto.FileDto;
 import com.yoonho.photoresizer.exception.CustomErrorPageException;
 import com.yoonho.photoresizer.exception.CustomIOException;
-import com.yoonho.photoresizer.exception.CustomNotJpgException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -46,28 +43,6 @@ public class FileService {
         }
 
         return new FileDto(uuid, fileName, null);
-    }
-
-    public void checkJpgFileType(FileDto fileDto) {
-        String uuid = fileDto.getUuid();
-        String fileName = fileDto.getFileName();
-        String savedName = uuid + "_" + fileName;
-        String filePath = uploadPath + "\\" + savedName;
-        File file = new File(filePath);
-
-        try {
-            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file));
-            FileType fileType = FileTypeDetector.detectFileType(stream);
-
-            if (fileType != FileType.Jpeg) {
-                file.delete();
-                throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.");
-            }
-        } catch (FileNotFoundException e) {
-            throw new CustomIOException("파일 로드 중 오류가 발생하였습니다.", e);
-        } catch (IOException e) {
-            throw new CustomIOException("파일 타입 추출 중 오류가 발생하였습니다.", e);
-        }
     }
 
     public String getContentType(Path path) {
