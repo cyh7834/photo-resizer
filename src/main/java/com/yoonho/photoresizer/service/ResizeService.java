@@ -1,23 +1,19 @@
 package com.yoonho.photoresizer.service;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.MetadataException;
-import com.drew.metadata.exif.ExifIFD0Directory;
 import com.yoonho.photoresizer.dto.FileDto;
-import com.yoonho.photoresizer.exception.CustomIOException;
-import com.yoonho.photoresizer.exception.CustomImageProcessingException;
-import com.yoonho.photoresizer.exception.CustomMetadataException;
 import com.yoonho.photoresizer.exception.CustomNotJpgException;
+import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
+import javax.imageio.*;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Iterator;
 
 @Service
 public class ResizeService {
@@ -34,94 +30,22 @@ public class ResizeService {
         String filePath = uploadPath + "\\" + savedName;
         File file = new File(filePath);
 
-        int orientation = getOrientation(file);
-        BufferedImage rotatedImage = rotateImage(file, orientation);
-        BufferedImage squareImage = createSquareBufferedImage(rotatedImage);
-
         try {
+            BufferedImage squareImage = createSquareBufferedImage(ImageIO.read(file));
+            JPEGImageWriteParam jpegParams = getJpegImageWriteParam();
+            ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
             File savedFile = new File(resizeFilePath, savedName);
-            ImageIO.write(squareImage, "JPG", savedFile);
-            long bytes = savedFile.length();
-            long kilobyte = bytes / 1024;
-            long megabyte = kilobyte / 1024;
-            fileDto.setFileSize(megabyte + "." + (kilobyte - (megabyte * 1024)) / 100 + " MB");
+            IIOMetadata metadata = getMetadata(file);
+            BufferedImage resizedImage = Scalr.resize(squareImage, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_EXACT, 1080);
+            IIOImage resultImage = new IIOImage(resizedImage, null, metadata);
+
+            writer.setOutput(new FileImageOutputStream(savedFile));
+            writer.write(null, resultImage, jpegParams);
+
+            fileDto.setFileSize(getFileSizeAsString(savedFile));
         } catch (IOException e) {
             throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.", e);
         }
-    }
-
-    private int getOrientation(File file) {
-        int orientation = 1;
-
-        try {
-            Metadata metadata = ImageMetadataReader.readMetadata(file);
-            Directory directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-
-            if (directory != null && directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)) {
-                orientation = directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
-            }
-
-            return orientation;
-        } catch (ImageProcessingException e) {
-            throw new CustomImageProcessingException("파일 메타 데이터 확인 중 오류가 발생하였습니다.", e);
-        } catch (IOException e) {
-            throw new CustomIOException("파일 로드 중 오류가 발생하였습니다.", e);
-        } catch (MetadataException e) {
-            throw new CustomMetadataException("파일 메타 데이터 추출 중 오류가 발생하였습니다.", e);
-        }
-    }
-
-    private BufferedImage rotateImage(File file, int orientation) {
-        BufferedImage bufferedImage = null;
-
-        try {
-            bufferedImage = ImageIO.read(file);
-        } catch (IOException e) {
-            throw new CustomIOException("파일 변환 중 오류가 발생하였습니다.", e);
-        }
-
-        if (orientation == 1) { // 정위치
-            return bufferedImage;
-        }
-        else if (orientation == 6) {
-            return rotateImage(bufferedImage, 90);
-        }
-        else if (orientation == 3) {
-            return rotateImage(bufferedImage, 180);
-        }
-        else if (orientation == 8) {
-            return rotateImage(bufferedImage, 270);
-        }
-        else {
-            return bufferedImage;
-        }
-    }
-
-    private BufferedImage rotateImage(BufferedImage bufferedImage, int radians) {
-        BufferedImage newImage;
-
-        int bufferedImageHeight = bufferedImage.getHeight();
-        int bufferedImageWidth = bufferedImage.getWidth();
-
-        if (radians == 90 || radians == 270) {
-            newImage = new BufferedImage(bufferedImageHeight, bufferedImageWidth, bufferedImage.getType());
-        }
-        else if (radians == 180) {
-            newImage = new BufferedImage(bufferedImageWidth, bufferedImageHeight, bufferedImage.getType());
-        }
-        else {
-            return bufferedImage;
-        }
-
-        Graphics2D graphics = (Graphics2D) newImage.getGraphics();
-        int newImageWidth = newImage.getWidth();
-        int newImageHeight = newImage.getHeight();
-
-        graphics.rotate(Math.toRadians(radians), newImageWidth / 2, newImageHeight / 2);
-        graphics.translate((newImageWidth - bufferedImageWidth) / 2, (newImageHeight - bufferedImageHeight) / 2);
-        graphics.drawImage(bufferedImage, 0, 0, bufferedImageWidth, bufferedImageHeight, null);
-
-        return newImage;
     }
 
     private BufferedImage createSquareBufferedImage(BufferedImage bufferedImage) {
@@ -162,5 +86,31 @@ public class ResizeService {
         }
 
         return newImage;
+    }
+
+    private JPEGImageWriteParam getJpegImageWriteParam() {
+        JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+        jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+        jpegParams.setCompressionQuality(1f);
+
+        return jpegParams;
+    }
+
+    private IIOMetadata getMetadata(File file) throws IOException {
+        ImageInputStream imageInputStream = ImageIO.createImageInputStream(file);
+        Iterator<ImageReader> readers = ImageIO.getImageReaders(imageInputStream);
+        ImageReader reader = readers.next();
+
+        reader.setInput(imageInputStream, true);
+
+        return reader.getImageMetadata(0);
+    }
+
+    private String getFileSizeAsString(File savedFile) {
+        long bytes = savedFile.length();
+        long kilobyte = bytes / 1024;
+        long megabyte = kilobyte / 1024;
+
+        return megabyte + "." + (kilobyte - (megabyte * 1024)) / 100 + " MB";
     }
 }
