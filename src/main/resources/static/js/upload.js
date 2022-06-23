@@ -65,7 +65,7 @@ let dropzone = new Dropzone('#demo-upload', {
         this.on('error', function(file, response) {
             let {li, mediaDiv, container, row, leftDiv, fileNameH5, fileInfo, rightDiv, downloadUl} = createListElement(file);
 
-            fileInfo.innerText = " " + response.comment;
+            fileInfo.innerText = response.comment !== undefined ? " " + response.comment : response;
 
             appendListElement(leftDiv, fileNameH5, fileInfo, row, rightDiv, container, mediaDiv, li, downloadUl);
         });
