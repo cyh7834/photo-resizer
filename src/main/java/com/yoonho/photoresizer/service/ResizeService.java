@@ -44,7 +44,7 @@ public class ResizeService {
 
             fileDto.setFileSize(getFileSizeAsString(savedFile));
         } catch (IOException e) {
-            throw new CustomNotJpgException("올바른 형식의 JPG 파일이 아닙니다.", e);
+            throw new CustomNotJpgException("Not a valid jpg file.", e);
         }
     }
 

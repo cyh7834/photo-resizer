@@ -39,7 +39,7 @@ public class FileService {
         try {
             multipartFile.transferTo(file);
         } catch (IOException e) {
-            throw new CustomIOException("파일 업로드 중 오류가 발생하였습니다.", e);
+            throw new CustomIOException("An error occurred while uploading the file.", e);
         }
 
         return new FileDto(uuid, fileName, null);

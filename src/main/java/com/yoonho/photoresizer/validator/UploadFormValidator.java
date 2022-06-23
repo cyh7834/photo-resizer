@@ -25,12 +25,12 @@ public class UploadFormValidator implements Validator {
 
         if (contentType == null || !isSupportedContentType(contentType)) {
             log.error("지원하지 않는 확장자의 변환 요청");
-            errors.reject("지원하지 않는 확장자 입니다.");
+            errors.reject("This extension is not supported.");
         }
 
         if (sizeInMb > 20) {
             log.error("20MB 이상의 파일 변환 요청");
-            errors.reject("20MB 이하의 파일만 변환이 가능합니다.");
+            errors.reject("Only files under 20MB can be converted.");
         }
     }
 

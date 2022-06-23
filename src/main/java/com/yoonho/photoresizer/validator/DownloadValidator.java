@@ -25,11 +25,11 @@ public class DownloadValidator implements Validator {
 
         if (!fileName.endsWith(".jpg") && !fileName.endsWith(".jpeg")) {
             log.error("jpg 외의 확장자 다운로드 요청");
-            errors.reject("올바른 요청이 아닙니다.");
+            errors.reject("This is not a valid request.");
         }
         else if (!Pattern.matches(pattern, uuid)) {
             log.error("올바르지 않은 UUID 요청");
-            errors.reject("올바른 요청이 아닙니다.");
+            errors.reject("This is not a valid request.");
         }
     }
 }
