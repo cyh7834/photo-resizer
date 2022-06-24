@@ -92,6 +92,8 @@ public class ResizeService {
         JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
         jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
         jpegParams.setCompressionQuality(1f);
+        jpegParams.setCompressionType("JPEG");
+        jpegParams.setOptimizeHuffmanTables(true);
 
         return jpegParams;
     }
