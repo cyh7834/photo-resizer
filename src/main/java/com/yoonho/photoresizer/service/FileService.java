@@ -33,7 +33,7 @@ public class FileService {
     public FileDto convertMultipartToFile(MultipartFile multipartFile) {
         String uuid = UUID.randomUUID().toString();
         String fileName =  multipartFile.getOriginalFilename();
-        String filePath = uploadPath + "\\" + uuid + "_" + fileName;
+        String filePath = uploadPath + uuid + "_" + fileName;
         File file = new File(filePath);
 
         try {

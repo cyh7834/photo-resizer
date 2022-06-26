@@ -27,7 +27,7 @@ public class ResizeService {
         String uuid = fileDto.getUuid();
         String fileName = fileDto.getFileName();
         String savedName = uuid + "_" + fileName;
-        String filePath = uploadPath + "\\" + savedName;
+        String filePath = uploadPath + savedName;
         File file = new File(filePath);
 
         try {
