@@ -11,6 +11,7 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageInputStream;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Iterator;
@@ -51,39 +52,22 @@ public class ResizeService {
     private BufferedImage createSquareBufferedImage(BufferedImage bufferedImage) {
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight(null);
-        int whitePixel, squareSize;
-
-        if (width > height) {
-            whitePixel = (int) (width - height) / 2;
-            squareSize = width;
-        }
-        else {
-            whitePixel = (int) (height - width) / 2;
-            squareSize = height;
-        }
+        int whitePixel = Math.abs(width - height) / 2;
+        int squareSize = Math.max(width, height);
 
         BufferedImage newImage = new BufferedImage(squareSize, squareSize, bufferedImage.getType());
+        Graphics2D graphics = newImage.createGraphics();
+        graphics.setColor(Color.white);
+        graphics.fillRect(0, 0, squareSize, squareSize);
 
-        for (int x = 0; x < squareSize; x++) {
-            for (int y = 0; y < squareSize; y++) {
-                if (squareSize == width) {
-                    if (y < whitePixel || y >= height + whitePixel) { //white pixel zone
-                        newImage.setRGB(x, y, 0xFFFFFF);
-                    }
-                    else {
-                        newImage.setRGB(x, y, bufferedImage.getRGB(x, y - whitePixel));
-                    }
-                }
-                else {
-                    if (x < whitePixel || x >= width + whitePixel) { //white pixel zone
-                        newImage.setRGB(x, y, 0xFFFFFF);
-                    }
-                    else {
-                        newImage.setRGB(x, y, bufferedImage.getRGB(x - whitePixel, y));
-                    }
-                }
-            }
+        if (squareSize == width) {
+            graphics.drawImage(bufferedImage, 0, whitePixel, null);
         }
+        else {
+            graphics.drawImage(bufferedImage, whitePixel, 0, null);
+        }
+
+        graphics.dispose();
 
         return newImage;
     }
