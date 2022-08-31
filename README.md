@@ -42,9 +42,8 @@ spring.datasource.driverClassName=org.postgresql.Driver
 spring.datasource.username=your_username
 spring.datasource.password=your_password
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-
-spring.servlet.multipart.location=your/upload/path
+spring.servlet.multipart.location=your/upload/directory/path
 spring.servlet.multipart.max-file-size=20MB
 spring.servlet.multipart.max-request-size=20MB
-resize.file.path=your/resize/path
+resize.file.path=your/resize/directory/path
 ```
