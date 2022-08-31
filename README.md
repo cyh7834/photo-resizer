@@ -18,6 +18,8 @@
 웹 서비스 구현을 위해 사용된 기술들:
 
 - [Spring Boot] - 스프링 부트 기반의 웹 애플리케이션 서버.
+- [Spring Data JPA] - 스프링의 JPA 모듈.
+- [Querydsl] - 자바 코드 기반 동적 쿼리 생성 프레임워크.
 - [imgscalr-lib] - 순수 자바로 구현된 이미지 프로세싱 라이브러리.
 - [Thymeleaf] - 서버 사이드 자바 템플릿 엔진.
 - [Bootstrap] - HTML, CSS, JS 라이브러리.
@@ -25,20 +27,24 @@
 
 ## Installation
 
-jar 파일을 빌드하고 cmd로 실행할 수 있음.
+maven을 사용하여 프로젝트를 빌드하고 command line으로 실행.
 ```sh
 git clone https://github.com/cyh7834/photo-resizer.git
 cd photo-resizer
 ./mvnw package
-java -jar target/*.jar
+java -jar target/*.jar -Dspring.config.location=file:///your/properties/file/path
 ```
 
-배포를 위한 환경 변수 설정의 예. <br/>
-working.directory.path에 설정된 경로의 파일들은 스케쥴러를 통해 삭제되기 때문에 주의해야 함.
+프로젝트 구동 또는 배포를 위한 properties. <br/>
 ```sh
-spring.servlet.multipart.location=D:/photo-resizer/upload/
+spring.datasource.url=jdbc:postgresql://your/postgresql/url
+spring.datasource.driverClassName=org.postgresql.Driver
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+spring.servlet.multipart.location=your/upload/path
 spring.servlet.multipart.max-file-size=20MB
 spring.servlet.multipart.max-request-size=20MB
-working.directory.path=D:/photo-resizer/
-resize.file.path=D:/photo-resizer/resize/
+resize.file.path=your/resize/path
 ```
