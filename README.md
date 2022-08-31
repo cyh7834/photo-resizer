@@ -32,7 +32,7 @@ maven을 사용하여 프로젝트를 빌드하고 command line으로 실행.
 git clone https://github.com/cyh7834/photo-resizer.git
 cd photo-resizer
 ./mvnw package
-java -jar target/*.jar -Dspring.config.location=file:///your/properties/file/path
+java -jar target/*.jar --spring.config.location=file:///your/properties/file/path
 ```
 
 프로젝트 구동 또는 배포를 위한 properties. <br/>
