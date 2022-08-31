@@ -3,32 +3,32 @@ package com.yoonho.photoresizer.service;
 import com.yoonho.photoresizer.dto.FileDto;
 import com.yoonho.photoresizer.exception.CustomErrorPageException;
 import com.yoonho.photoresizer.exception.CustomIOException;
+import com.yoonho.photoresizer.photo.domain.Photo;
+import com.yoonho.photoresizer.photo.dto.OldPhoto;
+import com.yoonho.photoresizer.photo.service.PhotoService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FileService {
     @Value("${spring.servlet.multipart.location}")
     private String uploadPath;
 
-    @Value("${working.directory.path}")
-    private String workingDirectoryPath;
-
-    private static final int DELETE_SEC = 3600;
+    private final PhotoService photoService;
 
     public FileDto convertMultipartToFile(MultipartFile multipartFile) {
         String uuid = UUID.randomUUID().toString();
@@ -38,6 +38,12 @@ public class FileService {
 
         try {
             multipartFile.transferTo(file);
+
+            Photo photo = new Photo();
+            photo.setUuid(uuid);
+            photo.setUploadPath(filePath);
+
+            photoService.insertPhoto(photo);
         } catch (IOException e) {
             throw new CustomIOException("An error occurred while uploading the file.", e);
         }
@@ -54,31 +60,28 @@ public class FileService {
     }
 
     public void deleteOldFile() {
-        Path dirPath = Paths.get(workingDirectoryPath);
-        List<Path> result;
+        List<OldPhoto> oldPhotos = photoService.selectOldPhoto();
+        HashSet<Long> deletedPhotoId = new HashSet<>();
 
-        try {
-            Stream<Path> walk = Files.walk(dirPath);
-            result = walk.filter(Files::isRegularFile)
-                    .collect(Collectors.toList());
+        for (OldPhoto oldPhoto : oldPhotos) {
+            String uploadPath = oldPhoto.getUploadPath();
+            String resizePath = oldPhoto.getResizePath();
 
-            for (Path path : result) {
-                long secondsFromModification = getSecondsFromModification(path);
-
-                if (secondsFromModification > DELETE_SEC) {
-                    log.info("리소스 파일 삭제 : " + path.getFileName());
-                    Files.deleteIfExists(path);
+            try {
+                if (uploadPath != null && Files.deleteIfExists(Paths.get(uploadPath))) {
+                    deletedPhotoId.add(oldPhoto.getId());
+                    log.info("업로드 리소스 파일 삭제 : " + uploadPath);
                 }
+                if (resizePath != null && Files.deleteIfExists(Paths.get(resizePath))) {
+                    deletedPhotoId.add(oldPhoto.getId());
+                    log.info("변환 리소스 파일 삭제 : " + resizePath);
+                }
+            } catch (IOException e) {
+                log.error("업로드 파일 삭제 여부 확인 중 오류가 발생하였습니다.");
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            log.error("업로드 파일 삭제 여부 확인 중 오류가 발생하였습니다.");
-            e.printStackTrace();
         }
-    }
 
-    private long getSecondsFromModification(Path path) throws IOException {
-        BasicFileAttributes basicFileAttributes = Files.readAttributes(path, BasicFileAttributes.class);
-
-        return (System.currentTimeMillis() - basicFileAttributes.lastModifiedTime().to(TimeUnit.MILLISECONDS)) / 1000;
+        photoService.deletePhotoByIds(deletedPhotoId);
     }
 }

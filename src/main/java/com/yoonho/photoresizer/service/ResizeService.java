@@ -2,6 +2,8 @@ package com.yoonho.photoresizer.service;
 
 import com.yoonho.photoresizer.dto.FileDto;
 import com.yoonho.photoresizer.exception.CustomNotJpgException;
+import com.yoonho.photoresizer.photo.service.PhotoService;
+import lombok.RequiredArgsConstructor;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.io.*;
 import java.util.Iterator;
 
 @Service
+@RequiredArgsConstructor
 public class ResizeService {
     @Value("${spring.servlet.multipart.location}")
     private String uploadPath;
@@ -24,18 +27,21 @@ public class ResizeService {
     @Value("${resize.file.path}")
     private String resizeFilePath;
 
+    private final PhotoService photoService;
+
     public void resizeJpg(FileDto fileDto) {
         String uuid = fileDto.getUuid();
         String fileName = fileDto.getFileName();
         String savedName = uuid + "_" + fileName;
         String filePath = uploadPath + savedName;
+        String resultPath = resizeFilePath + savedName;
         File file = new File(filePath);
 
         try {
             BufferedImage squareImage = createSquareBufferedImage(ImageIO.read(file));
             JPEGImageWriteParam jpegParams = getJpegImageWriteParam();
             ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
-            File savedFile = new File(resizeFilePath, savedName);
+            File savedFile = new File(resultPath);
             IIOMetadata metadata = getMetadata(file);
             BufferedImage resizedImage = Scalr.resize(squareImage, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_EXACT, 1080);
             IIOImage resultImage = new IIOImage(resizedImage, null, metadata);
@@ -44,6 +50,8 @@ public class ResizeService {
             writer.write(null, resultImage, jpegParams);
 
             fileDto.setFileSize(getFileSizeAsString(savedFile));
+
+            photoService.updateResizePhoto(uuid, resultPath);
         } catch (IOException e) {
             throw new CustomNotJpgException("Not a valid jpg file.", e);
         }
