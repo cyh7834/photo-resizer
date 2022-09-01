@@ -66,18 +66,23 @@ public class FileService {
         for (OldPhoto oldPhoto : oldPhotos) {
             String uploadPath = oldPhoto.getUploadPath();
             String resizePath = oldPhoto.getResizePath();
+            Long id = oldPhoto.getId();
 
             try {
-                if (uploadPath != null && Files.deleteIfExists(Paths.get(uploadPath))) {
-                    deletedPhotoId.add(oldPhoto.getId());
-                    log.info("업로드 리소스 파일 삭제 : " + uploadPath);
+                Files.deleteIfExists(Paths.get(uploadPath));
+                log.info("업로드 리소스 파일 삭제 : " + uploadPath);
+
+                if (resizePath == null) {
+                    deletedPhotoId.add(id);
+                    continue;
                 }
-                if (resizePath != null && Files.deleteIfExists(Paths.get(resizePath))) {
-                    deletedPhotoId.add(oldPhoto.getId());
-                    log.info("변환 리소스 파일 삭제 : " + resizePath);
-                }
+
+                Files.deleteIfExists(Paths.get(resizePath));
+                log.info("변환 리소스 파일 삭제 : " + resizePath);
+                deletedPhotoId.add(id);
             } catch (IOException e) {
                 log.error("업로드 파일 삭제 여부 확인 중 오류가 발생하였습니다.");
+                deletedPhotoId.remove(id);
                 e.printStackTrace();
             }
         }
