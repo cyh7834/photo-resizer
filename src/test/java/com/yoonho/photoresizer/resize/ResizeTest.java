@@ -7,12 +7,10 @@ import com.yoonho.photoresizer.exception.CustomNotJpgException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -25,17 +23,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@TestInstance(value = PER_CLASS)
 @AutoConfigureMockMvc
 public class ResizeTest {
-    @Autowired
-    ResourceLoader resourceLoader;
-
     @Autowired
     MockMvc mockMvc;
 
