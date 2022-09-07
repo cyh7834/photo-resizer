@@ -1,8 +1,8 @@
 package com.yoonho.photoresizer.resize;
 
 import com.google.gson.Gson;
-import com.yoonho.photoresizer.dto.FileDto;
-import com.yoonho.photoresizer.dto.ResponseDto;
+import com.yoonho.photoresizer.file.dto.FileDto;
+import com.yoonho.photoresizer.response.dto.ResponseDto;
 import com.yoonho.photoresizer.exception.CustomNotJpgException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

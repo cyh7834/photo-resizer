@@ -1,4 +1,4 @@
-package com.yoonho.photoresizer.controller;
+package com.yoonho.photoresizer.exception.controller;
 
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;

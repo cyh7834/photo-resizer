@@ -1,6 +1,6 @@
 package com.yoonho.photoresizer.response;
 
-import com.yoonho.photoresizer.dto.ResponseDto;
+import com.yoonho.photoresizer.response.dto.ResponseDto;
 import com.yoonho.photoresizer.exception.CustomErrorPageException;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;

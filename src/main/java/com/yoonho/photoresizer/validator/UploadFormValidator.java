@@ -1,6 +1,6 @@
 package com.yoonho.photoresizer.validator;
 
-import com.yoonho.photoresizer.dto.UploadDto;
+import com.yoonho.photoresizer.resize.dto.UploadDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;

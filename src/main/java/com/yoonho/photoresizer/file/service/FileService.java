@@ -1,6 +1,6 @@
-package com.yoonho.photoresizer.service;
+package com.yoonho.photoresizer.file.service;
 
-import com.yoonho.photoresizer.dto.FileDto;
+import com.yoonho.photoresizer.file.dto.FileDto;
 import com.yoonho.photoresizer.exception.CustomErrorPageException;
 import com.yoonho.photoresizer.exception.CustomIOException;
 import com.yoonho.photoresizer.photo.domain.Photo;

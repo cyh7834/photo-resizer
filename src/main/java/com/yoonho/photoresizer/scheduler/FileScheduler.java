@@ -1,6 +1,6 @@
 package com.yoonho.photoresizer.scheduler;
 
-import com.yoonho.photoresizer.service.FileService;
+import com.yoonho.photoresizer.file.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

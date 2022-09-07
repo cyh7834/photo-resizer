@@ -1,6 +1,6 @@
-package com.yoonho.photoresizer.service;
+package com.yoonho.photoresizer.resize.service;
 
-import com.yoonho.photoresizer.dto.FileDto;
+import com.yoonho.photoresizer.file.dto.FileDto;
 import com.yoonho.photoresizer.exception.CustomNotJpgException;
 import com.yoonho.photoresizer.photo.service.PhotoService;
 import lombok.RequiredArgsConstructor;

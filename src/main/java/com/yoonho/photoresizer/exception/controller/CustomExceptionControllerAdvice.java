@@ -1,6 +1,7 @@
-package com.yoonho.photoresizer.exception;
+package com.yoonho.photoresizer.exception.controller;
 
-import com.yoonho.photoresizer.dto.ResponseDto;
+import com.yoonho.photoresizer.response.dto.ResponseDto;
+import com.yoonho.photoresizer.exception.*;
 import com.yoonho.photoresizer.response.Message;
 import com.yoonho.photoresizer.response.ResponseService;
 import com.yoonho.photoresizer.response.StatusEnum;

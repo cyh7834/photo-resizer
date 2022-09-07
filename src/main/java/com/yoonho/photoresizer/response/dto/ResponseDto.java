@@ -1,4 +1,4 @@
-package com.yoonho.photoresizer.dto;
+package com.yoonho.photoresizer.response.dto;
 
 import com.yoonho.photoresizer.response.StatusEnum;
 import lombok.AllArgsConstructor;

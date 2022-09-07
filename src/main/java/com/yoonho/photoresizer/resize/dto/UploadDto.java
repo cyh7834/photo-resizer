@@ -1,4 +1,4 @@
-package com.yoonho.photoresizer.dto;
+package com.yoonho.photoresizer.resize.dto;
 
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;

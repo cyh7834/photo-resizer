@@ -1,4 +1,4 @@
-package com.yoonho.photoresizer.dto;
+package com.yoonho.photoresizer.file.dto;
 
 import lombok.*;
 
