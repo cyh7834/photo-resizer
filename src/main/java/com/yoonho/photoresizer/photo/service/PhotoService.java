@@ -25,6 +25,12 @@ public class PhotoService {
     public void updateResizePhoto(String uuid, String resizePath) {
         Photo photo = photoRepository.findByUuid(uuid);
         photo.setResizePath(resizePath);
+        photo.setResizedAt(LocalDateTime.now());
+    }
+
+    @Transactional
+    public String findResizePathByUUID(String uuid) {
+        return photoRepository.findResizePathByUUID(uuid);
     }
 
     @Transactional(readOnly = true)

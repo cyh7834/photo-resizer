@@ -1,6 +1,7 @@
 package com.yoonho.photoresizer.photo.repository;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yoonho.photoresizer.photo.dto.OldPhoto;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,15 @@ import static com.yoonho.photoresizer.photo.domain.QPhoto.*;
 @RequiredArgsConstructor
 public class PhotoRepositoryImpl implements PhotoRepositoryCustom{
     private final JPAQueryFactory queryFactory;
+
+    @Override
+    public String findResizePathByUUID(String uuid) {
+        return queryFactory
+                .select(photo.resizePath)
+                .from(photo)
+                .where(photoUuidEq(uuid))
+                .fetchOne();
+    }
 
     @Override
     public List<OldPhoto> findOldPhoto(LocalDateTime localDateTime) {
@@ -39,5 +49,9 @@ public class PhotoRepositoryImpl implements PhotoRepositoryCustom{
                 .delete(photo)
                 .where(photo.id.in(ids))
                 .execute();
+    }
+
+    private BooleanExpression photoUuidEq(String uuid) {
+        return uuid != null ? photo.uuid.eq(uuid) : null;
     }
 }
