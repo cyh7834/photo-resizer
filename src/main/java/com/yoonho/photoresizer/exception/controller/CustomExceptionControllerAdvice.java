@@ -43,14 +43,6 @@ public class CustomExceptionControllerAdvice {
                 , StatusEnum.INTERNAL_SERVER_ERROR, null, exception.getMessage()));
     }
 
-    @ExceptionHandler(CustomMetadataException.class)
-    public ResponseEntity<Message> handleCustomMetadataException(CustomMetadataException exception) {
-        log.error("CustomMetadataException", exception);
-
-        return responseService.getResponseEntity(new ResponseDto(HttpStatus.INTERNAL_SERVER_ERROR
-                , StatusEnum.INTERNAL_SERVER_ERROR, null, exception.getMessage()));
-    }
-
     @ExceptionHandler(CustomErrorPageException.class)
     public String getErrorPage(CustomErrorPageException customErrorPageException, Model model) {
         log.error("error", customErrorPageException);

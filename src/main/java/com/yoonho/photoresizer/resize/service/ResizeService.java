@@ -1,5 +1,6 @@
 package com.yoonho.photoresizer.resize.service;
 
+import com.yoonho.photoresizer.exception.CustomImageProcessingException;
 import com.yoonho.photoresizer.file.dto.FileDto;
 import com.yoonho.photoresizer.exception.CustomNotJpgException;
 import com.yoonho.photoresizer.photo.service.PhotoService;
@@ -38,11 +39,16 @@ public class ResizeService {
         File file = new File(filePath);
 
         try {
+            IIOMetadata metadata = getMetadata(file);
+
+            if (!metadata.getNativeMetadataFormatName().equals("javax_imageio_jpeg_image_1.0")) {
+                throw new CustomNotJpgException("Not a valid jpg file.");
+            }
+
             BufferedImage squareImage = createSquareBufferedImage(ImageIO.read(file));
             JPEGImageWriteParam jpegParams = getJpegImageWriteParam();
             ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
             File savedFile = new File(resultPath);
-            IIOMetadata metadata = getMetadata(file);
             BufferedImage resizedImage = Scalr.resize(squareImage, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_EXACT, 1080);
             IIOImage resultImage = new IIOImage(resizedImage, null, metadata);
 
@@ -53,7 +59,7 @@ public class ResizeService {
 
             photoService.updateResizePhoto(uuid, resultPath);
         } catch (IOException e) {
-            throw new CustomNotJpgException("Not a valid jpg file.", e);
+            throw new CustomImageProcessingException("An error occurred while processing the file.", e);
         }
     }
 
