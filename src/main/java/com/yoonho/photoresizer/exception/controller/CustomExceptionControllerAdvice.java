@@ -43,6 +43,14 @@ public class CustomExceptionControllerAdvice {
                 , StatusEnum.INTERNAL_SERVER_ERROR, null, exception.getMessage()));
     }
 
+    @ExceptionHandler(CustomAlreadySquareImageException.class)
+    public ResponseEntity<Message> handleCustomAlreadySquareImageException(CustomAlreadySquareImageException exception) {
+        log.info("CustomAlreadySquareImageException", exception);
+
+        return responseService.getResponseEntity(new ResponseDto(HttpStatus.BAD_REQUEST
+                , StatusEnum.BAD_REQUEST, null, exception.getMessage()));
+    }
+
     @ExceptionHandler(CustomErrorPageException.class)
     public String getErrorPage(CustomErrorPageException customErrorPageException, Model model) {
         log.error("error", customErrorPageException);

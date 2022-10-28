@@ -1,5 +1,6 @@
 package com.yoonho.photoresizer.resize.service;
 
+import com.yoonho.photoresizer.exception.CustomAlreadySquareImageException;
 import com.yoonho.photoresizer.exception.CustomImageProcessingException;
 import com.yoonho.photoresizer.file.dto.FileDto;
 import com.yoonho.photoresizer.exception.CustomNotJpgException;
@@ -66,6 +67,11 @@ public class ResizeService {
     private BufferedImage createSquareBufferedImage(BufferedImage bufferedImage) {
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight(null);
+
+        if (width == height) {
+            throw new CustomAlreadySquareImageException("Already square image.");
+        }
+
         int whitePixel = Math.abs(width - height) / 2;
         int squareSize = Math.max(width, height);
 
