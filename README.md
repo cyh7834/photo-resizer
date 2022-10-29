@@ -20,7 +20,6 @@
 - [Spring Boot] - 스프링 부트 기반의 웹 애플리케이션 서버.
 - [Spring Data JPA] - 스프링의 JPA 모듈.
 - [Querydsl] - 자바 코드 기반 동적 쿼리 생성 프레임워크.
-- [imgscalr-lib] - 순수 자바로 구현된 이미지 프로세싱 라이브러리.
 - [Thymeleaf] - 서버 사이드 자바 템플릿 엔진.
 - [Bootstrap] - HTML, CSS, JS 라이브러리.
 - [Maven] - 자바 프로젝트 의존성 관리 도구.

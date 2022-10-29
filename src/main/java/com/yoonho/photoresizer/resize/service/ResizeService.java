@@ -6,7 +6,6 @@ import com.yoonho.photoresizer.file.dto.FileDto;
 import com.yoonho.photoresizer.exception.CustomNotJpgException;
 import com.yoonho.photoresizer.photo.service.PhotoService;
 import lombok.RequiredArgsConstructor;
-import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -50,8 +49,7 @@ public class ResizeService {
             JPEGImageWriteParam jpegParams = getJpegImageWriteParam();
             ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
             File savedFile = new File(resultPath);
-            BufferedImage resizedImage = Scalr.resize(squareImage, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_EXACT, 1080);
-            IIOImage resultImage = new IIOImage(resizedImage, null, metadata);
+            IIOImage resultImage = new IIOImage(squareImage, null, metadata);
 
             writer.setOutput(new FileImageOutputStream(savedFile));
             writer.write(null, resultImage, jpegParams);
